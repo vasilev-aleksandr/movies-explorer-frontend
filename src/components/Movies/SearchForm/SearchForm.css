@@ -45,6 +45,12 @@
   border: none;
   border-radius: 5px;
   background: #4285f4;
+  cursor: pointer;
+}
+
+.search__btn:hover {
+  opacity: .8;
+  transition: opacity .3s ease-in-out;
 }
 
 .search__filter {

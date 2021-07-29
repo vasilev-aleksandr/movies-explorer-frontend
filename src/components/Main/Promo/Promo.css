@@ -49,6 +49,11 @@
   display: flex;
   list-style-type: none;
   margin: 0;
+  padding-left: 0;
+}
+
+.promo__navigation-list li:last-of-type .promo__link { 
+  margin-right: 0;
 }
 
 .promo__link {
@@ -58,6 +63,7 @@
   text-decoration: underline;
   color: #fff;
 }
+
 
 
 @media screen and (max-width: 768px) {
@@ -74,7 +80,7 @@
 
 @media screen and (max-width: 320px) {
   .promo {
-    max-width: 292px;
+    max-width: 100%;
   }
 
   .promo__title {

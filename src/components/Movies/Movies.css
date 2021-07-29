@@ -18,6 +18,12 @@
   border: none;
   border-radius: 6px;
   background: #2f2f2f;
+  cursor: pointer;
+}
+
+.movies__more:hover{
+  opacity: .8;
+  transition: opacity .3s ease-in-out;
 }
 
 @media screen and (max-width: 1280px) {
