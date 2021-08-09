@@ -79,6 +79,10 @@
 }
 
 @media screen and (max-width: 768px) {
+  .header {
+  }
+
+
   .header__logo {
     left: calc((100vw - 400px) / (768 - 400) * (30 - 14) + 14px);
   }
@@ -116,7 +120,6 @@
 }
 
 @media screen and (max-width: 400px) {
-
   .header__logo {
     left: 14px;
   }

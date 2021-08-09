@@ -1,21 +1,41 @@
 import React from "react";
 import "./SearchForm.css";
+import FilterCheckbox from "../../FilterCheckbox/FilterCheckbox";
 
-function SearchForm() {
+function SearchForm({
+  onSubmit,
+  searchValue,
+  setSearchValue,
+  inputError,
+  setInputError,
+  isShortFilms,
+  setIsShortFilms,
+}) {
   return (
-    <form className="search">
-      <div className="search__container search__container_type_query">
-        <input className="search__text" required/>
-        <button type="submit" className="search__btn">Поиск</button>
+    <section className="search">
+      <div className="search__container">
+        <form className="search__form" onSubmit={onSubmit}>
+          <div className="search__wrap">
+            <input
+              placeholder="Фильм"
+              className="search__input"
+              value={searchValue}
+              onChange={(evt) => {
+                setSearchValue(evt.target.value);
+              }}
+              onClick={() => setInputError("")}
+            />
+            <button type="submit" className="search__submit">Поиск</button>
+          </div>
+          <span className="search__input-error">{inputError}</span>
+          <FilterCheckbox
+            filterText="Короткометражки"
+            isShortFilms={isShortFilms}
+            setIsShortFilms={setIsShortFilms}
+          />
+        </form>
       </div>
-      <div className="search__container search__container_type_filter">
-        <label>
-          <input type="checkbox" className="search__filter"/>
-          <span className="search__visible-filter"/>
-        </label>
-        <label className="search__label">Короткометражки</label>
-      </div>
-    </form>
+    </section>
   );
 }
 

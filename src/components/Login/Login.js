@@ -2,9 +2,21 @@ import React from "react";
 import "./Login.css";
 import { Link } from "react-router-dom";
 import Form from "../Form/Form";
+import CallbackValidation from "../../validation/CallbackValidation";
 import headerIcon from "../../images/header-icon.svg";
 
-function Login() {
+function Login( {handleLogin, loginError }) {
+  const formCallbackValidation = CallbackValidation();
+  const { email, password } = formCallbackValidation.values;
+
+  const submitHandle = (event) => {
+    event.preventDefault();
+    handleLogin(email, password);
+    formCallbackValidation.resetForm();
+  };
+
+
+
   return (
     <section className="login">
       <div className="login__container">
@@ -19,6 +31,10 @@ function Login() {
             route: "/signup",
             linkText: "Регистрация",
           }}
+          submitHandle={submitHandle}
+          validation={formCallbackValidation}
+          formName="login"
+          loginError={loginError}
         />
       </div>
     </section>
