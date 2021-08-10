@@ -106,7 +106,7 @@ class MainApi {
 }
 
 const mainApi = new MainApi({
-  baseUrl: "https://api.vasilevdiploma.nomoredomains.club",
+  baseUrl: "https://api.vasilev.students.nomoredomains.club",
   headers: {
     "Content-Type": "application/json",
     Authorization: `Bearer ${localStorage.getItem("jwt")}`,

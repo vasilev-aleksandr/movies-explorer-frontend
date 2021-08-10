@@ -15,7 +15,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "deploy": "npm run build && scp -r ./build/* vasilev@178.154.240.183:/home/vasilev/movies-explorer-frontend"
+    "deploy": "npm run build &&  scp -r ./build/* vasilev@84.201.132.240:/home/vasilev/movies-explorer-frontend"
   },
   "eslintConfig": {
     "extends": [
