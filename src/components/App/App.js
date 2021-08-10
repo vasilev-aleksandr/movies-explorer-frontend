@@ -150,11 +150,9 @@ function App() {
               registrationError={registrationError}
             />
           </Route>
-          {loggedIn && (
             <Route path="*">
               <Error/>
-            </Route>
-          )}
+          </Route>
         </Switch>
       </CurrentUserContext.Provider>
     </div>
