@@ -8,6 +8,8 @@ import MoviesCardList from "./MoviesCardList/MoviesCardList";
 import MoviesApi from "../../utils/MoviesApi";
 import MainApi from "../../utils/MainApi";
 import { useLocation } from "react-router-dom";
+import CurrentUserContext from "../../contexts/CurrentUserContext";
+
 
 
 import {
@@ -15,36 +17,43 @@ import {
   screenSizeDefinition,
 } from "../../utils/ScreenDefinition";
 
+
 function Movies({loggedIn}) {
   const { pathname } = useLocation();
-  const [movies, setMoviesList] = useState([]); //
+  const [movies, setMoviesList] = useState([]); 
   const [renderedFilms, setRenderedFilms] = useState([]);
   const [countClickMoreFilms, setCountClickMoreFilms] = useState(1);
   const [searchValue, setSearchValue] = useState("");
   const [inputError, setInputError] = useState("");
   const [visibilityMoviesList, setVisibilityMoviesList] = useState("");
+
   const [isPreloaderOpen, setIsPreloaderOpen] = useState("");
   const [savedMovies, setSavedMovies] = useState([]);
   const [visibilityBtnYet, setVisibilityBtnYet] = useState(
     "movies__button_hidden"
   );
   const [isShortFilms, setIsShortFilms] = useState(false);
+
+  const currentUser = React.useContext(CurrentUserContext);
   
   useEffect(() => {
     MainApi.getSavedMovies()
       .then((savedMoviesData) => {
         if (savedMoviesData) {
-          setSavedMovies(savedMoviesData);
-        }
-      })
+        const filteredMoviesList = savedMoviesData.filter((movie) => movie.owner === currentUser._id)
+        setSavedMovies(filteredMoviesList);
+      }
+    })
       .catch((err) => {
-        console.log(err);
-      });
-
+      console.log(err);
+    });
+    
     if (pathname === "/saved-movies") {
-      setVisibilityMoviesList("movies_visibility");
-    }
-  }, []);
+        setVisibilityMoviesList("movies_visibility");
+      }
+    }, [currentUser._id, pathname]);
+
+  
 
   function shortMoviesHandle() {
     return movies.filter((movie) => movie.duration <= 40);
@@ -92,7 +101,7 @@ function Movies({loggedIn}) {
 
   function filterMoviesFromLS(moviesList) {
     const films = moviesList.filter((movie) =>
-      movie.nameRU.includes(searchValue)
+      movie.nameRU.toLowerCase().includes(searchValue.toLowerCase())
     );
 
     setMoviesList(() => {
@@ -133,7 +142,7 @@ function Movies({loggedIn}) {
       setVisibilityBtnYet("");
     } else {
       setSavedMovies(
-        savedMovies.filter((movie) => movie.nameRU.includes(searchValue))
+        savedMovies.filter((movie) => movie.nameRU.toLowerCase().includes(searchValue.toLowerCase()))
       );
       setVisibilityMoviesList("movies_visibility");
       setIsPreloaderOpen("");

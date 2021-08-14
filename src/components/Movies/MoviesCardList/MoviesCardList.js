@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./MoviesCardList.css";
 import {useLocation} from "react-router-dom";
 import MoviesCard from "../MoviesCard/MoviesCard";
@@ -20,7 +20,7 @@ function MoviesCardList({
   const { pathname } = useLocation();
 
   const [visibilityNotFound, setVisibilityNotFound] = useState('')  
-  React.useEffect(() => {
+  useEffect(() => {
 
     const cards = countInitCards();
 
@@ -36,11 +36,11 @@ function MoviesCardList({
 
     }
 
-      if (localStorage.getItem('foundFilms')) {
-        setRenderedFilms(JSON.parse(localStorage.getItem('foundFilms')).slice(0, cards));
+   if (localStorage.getItem('foundFilms')) {
+      setRenderedFilms(JSON.parse(localStorage.getItem('foundFilms')).slice(0, cards));
       }
 
-  }, [movies, setRenderedFilms, pathname])
+  }, [movies, setRenderedFilms, pathname, setVisibilityBtnYet, setVisibilityMoviesList])
 
     function parseDurationMovie(durationMinutes) {
     const hours = Math.floor(durationMinutes / 60);
@@ -78,7 +78,7 @@ function MoviesCardList({
               cardName={movie.nameRU}
               cardDuration={parseDurationMovie(movie.duration)}
               imageLink={movie.image ? movie.image : "https://thumbnailer.mixcloud.com/unsafe/900x900/extaudio/c/e/e/5/95df-f97e-4e8b-a1d5-94f3ceb4f5ea"}
-              trailerLink={movie.trailerLink}
+              trailerLink={movie.trailer}
               addMovie={addMovie}
               removeMovie={removeMovie}
               savedMovies={savedMovies}

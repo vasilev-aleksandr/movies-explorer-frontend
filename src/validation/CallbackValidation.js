@@ -15,7 +15,6 @@ function CallbackValidation() {
     const { target } = event;
     const { name } = target;
     const { value } = target;
-    console.log(name, value)
     const error = validation(name, value);
     setErrors(validation(name, value));
     setValues({ ...values, [name]: value });

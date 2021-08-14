@@ -6,6 +6,7 @@ import headerIcon from "../../images/header-icon.svg";
 import CallbackValidation from "../../validation/CallbackValidation";
 
 
+
 function Register({ handleRegister, registrationError }) {
   const formCallbackValidation = CallbackValidation();
   const { email, password, name } = formCallbackValidation.values;

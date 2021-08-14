@@ -2,7 +2,7 @@ import "./App.css";
 import React, { useState, useEffect } from "react";
 import Main from "../Main/Main";
 import Header from "../Header/Header";
-import { Route, Switch, useLocation, useHistory } from "react-router";
+import { Route, Switch, useLocation, useHistory, Redirect } from "react-router";
 import Footer from "../Footer/Footer";
 import Error from "../Error/Error";
 import Login from "../Login/Login";
@@ -12,6 +12,7 @@ import Movies from "../Movies/Movies";
 import MainApi from "../../utils/MainApi";
 import CurrentUserContext from "../../contexts/CurrentUserContext";
 import ProtectedRoute from "../ProtectedRoute/ProtectedRoute";
+import Preloader from '../Preloader/Preloader';
 
 
 
@@ -25,35 +26,39 @@ function App() {
   const [EditError, setEditError] = useState(false);
   const history = useHistory();
   const { pathname } = useLocation();
+  const [isPreloaderOpen, setIsPreloaderOpen] = useState(true);
 
-
-
-
-  function isLoggedInCheck() {
-    const jwt = localStorage.getItem("jwt");
-    if (jwt) {
-      MainApi.getInfo()
-        .then((userInfo) => {
-          if (userInfo) {
-            setCurrentUser(userInfo);
-            setLoggedIn(true);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }
 
   useEffect(() => {
     isLoggedInCheck();
   }, []);
+
+  function isLoggedInCheck() {
+    setIsPreloaderOpen(true);
+    const jwt = localStorage.getItem("jwt");
+    if (jwt) {
+      MainApi.getInfo()
+      .then((userInfo) => {
+    if (userInfo) {
+      setCurrentUser(userInfo);
+      setLoggedIn(true);
+    }
+    })
+    .catch((err) => {
+      
+    })
+    .finally(() => setIsPreloaderOpen(false))
+    } else {
+      setIsPreloaderOpen(false)
+      }
+    }
 
 
   function handleLogin(email, password) {
     MainApi.login(email, password)
       .then((data) => {
         if (data) {
+          setCurrentUser(data.user);
           setLoggedIn(true);
           history.push("/movies");
         }
@@ -64,11 +69,13 @@ function App() {
       });
   }
 
+
   function handleRegister(email, password, name) {
     MainApi.register(email, password, name)
       .then((data) => {
         if (data) {
           handleLogin(email, password);
+          setLoggedIn(true);
           history.push("/signin");
         }
       })
@@ -90,15 +97,17 @@ function App() {
       })
       .catch(() => {
         setEditError(true);
-      });
+      })
   }
 
-  function handleLogout() {
-    history.push("/");
-    setLoggedIn(false);
-    localStorage.clear();
+  function handleLogout() { 
+    history.push("/"); 
+    setLoggedIn(false); 
+    setCurrentUser({});
+    localStorage.clear(); 
   }
 
+  if (isPreloaderOpen) return <Preloader isPreloaderOpen={isPreloaderOpen}/>
   return (
     <div className="page">
       <CurrentUserContext.Provider value={currentUser}>
@@ -110,7 +119,6 @@ function App() {
           <Main />
           <Footer />
         </Route>
-        {loggedIn && (
           <ProtectedRoute
             path="/movies"
             exact
@@ -118,8 +126,6 @@ function App() {
             loggedIn={loggedIn}
             currentUser={currentUser}
           />
-        )}
-        {loggedIn && (
           <ProtectedRoute
             path="/saved-movies"
             exact
@@ -127,8 +133,6 @@ function App() {
             loggedIn={loggedIn}
             currentUser={currentUser}
             />
-          )}
-        {loggedIn && (
           <ProtectedRoute
             path="/profile"
             exact
@@ -140,11 +144,14 @@ function App() {
             EditError={EditError}
             isEditDone={isEditDone}
             />
-          )}
           <Route path="/signin" exact>
-            <Login handleLogin={handleLogin} loginError={loginError} />
+            {loggedIn && <Redirect to="/"/>}
+            <Login 
+              handleLogin={handleLogin} 
+              loginError={loginError} />
           </Route>
           <Route path="/signup" exact>
+          {loggedIn && <Redirect to="/"/>}
             <Register
               handleRegister={handleRegister}
               registrationError={registrationError}

@@ -58,16 +58,17 @@ class MainApi {
         if (data.token) {
           localStorage.setItem("jwt", data.token);
           this.updateHeaders();
-          return data.token;
+          return data;
         }
         return Promise.reject(new Error(`Возникла ошибка: ${data.status}`));
       });
   }
 
+
   updateHeaders() {
     this._headers = {
       "Content-Type": "application/json",
-      Authorization: `${localStorage.getItem("jwt")}`,
+      Authorization: `Bearer ${localStorage.getItem("jwt")}`,
     };
   }
 
@@ -106,8 +107,8 @@ class MainApi {
 }
 
 const mainApi = new MainApi({
-  baseUrl: "https://api.vasilev.students.nomoredomains.club",
-  headers: {
+   baseUrl: "https://api.vasilev.students.nomoredomains.club",
+   headers: {
     "Content-Type": "application/json",
     Authorization: `Bearer ${localStorage.getItem("jwt")}`,
   },

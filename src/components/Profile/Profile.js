@@ -16,13 +16,12 @@ function Profile({
   const formWithValidation = CallbackValidation();
   const { email, name } = formWithValidation.values;
   
-
   useEffect(() => {
     formWithValidation.setValues({
       email: currentUser.email,
       name: currentUser.name,
     });
-  }, [currentUser]);
+  }, []);
 
 
 
@@ -49,7 +48,7 @@ function Profile({
           >
             <label className="profile__label" htmlFor="name">
               Имя
-              <input
+              <input 
                 type="text"
                 onChange={formWithValidation.handleChange}
                 value={name || ""}

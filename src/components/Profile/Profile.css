@@ -1,9 +1,9 @@
 .profile {
-  height: 90vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  margin-top: 74px;
 }
 
 .profile__container {
@@ -14,7 +14,7 @@
 }
 
 .profile__title {
-  margin: 0 0 120px;
+  margin: 0 0 123px;
   font-size: 24px;
   font-weight: 500;
   line-height: 29px;
@@ -56,13 +56,14 @@
 }
 
 .profile__btn-edit {
-  margin-top: 220px;
+  margin-top: 190px;
   border: none;
   background-color: transparent;
   color: white;
   font-size: 13px;
   font-weight: 400;
   line-height: 15px;
+  cursor: pointer;
 }
 
 .profile__btn-logout {
@@ -72,10 +73,8 @@
   font-size: 13px;
   font-weight: 500;
   line-height: 15px;
-}
-
-.profile__btn-edit:disabled {
-  opacity: 0.4;
+  cursor: pointer;
+  margin-bottom: 70px;
 }
 
 .profile__form-error {
@@ -92,8 +91,41 @@
   line-height: 12px;
 }
 
+
+@media screen and (max-width: 768px) {
+  .profile {
+    margin-top: 236px;
+  }
+  .profile__title{
+    margin-bottom: 96px;
+  }
+  .profile__form {
+    margin-bottom: 269px;
+  }
+
+}
+
+
 @media screen and (max-width: 576px) {
+  .profile {
+    margin-top: 70px;
+  }
+
+  .profile__title{
+    margin-bottom: 80px;
+  }
+
   .profile__container {
     max-width: 270px;
+  }
+
+  .profile__form {
+    margin-bottom: 40px;
+  }
+
+  
+
+  .profile__btn-edit {
+    margin-top: 330px;
   }
 }

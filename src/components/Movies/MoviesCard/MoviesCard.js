@@ -17,46 +17,41 @@ function MoviesCard({
   savedMovies,
 }) {
   const currentUser = React.useContext(CurrentUserContext);
-  const [isAddedCard, setIsAddedCard] = useState(false);
-
+  const [isAddedCard, setIsAddedCard] = useState(false)
   const { pathname } = useLocation();
+
   const moviesIcon = isAddedCard ? likeIconActive : likeIcon;
   const cardIcon = pathname === "/movies" ? moviesIcon : deleteIcon;
 
-  function handleLikeMovie() {
-    if (!isAddedCard) {
-      addMovie(movie);
-      setIsAddedCard(true);
-      console.log()
-    } else {
-      const movieItem = savedMovies.filter(
-        (savedMovie) => savedMovie.movieId === movie.id
-      );
-      removeMovie(movieItem[0].data._id);
-      setIsAddedCard(false);
+  useEffect(() => {
+    if (savedMovies.length > 0) {
+    setIsAddedCard(
+    savedMovies.some(
+    (savedMovie) =>
+    savedMovie.movieId === movie.id &&
+    savedMovie.owner === currentUser._id
+    )
+    );
     }
-  }
+    }, [currentUser._id, movie.id, savedMovies]); 
+
+  function handleLikeMovie() {
+    console.log(savedMovies)
+    console.log(movie)
+    console.log(currentUser)
+    if (!isAddedCard) {
+    addMovie(movie);
+    setIsAddedCard(true);
+    } else {
+    const movieToRemove = savedMovies.find(m => m.movieId === movie.id)
+    removeMovie(movieToRemove._id);
+    setIsAddedCard(false);
+    }
+    }
 
   function handleDeleteButton() {
     removeMovie(movie._id);
   }
-
-  useEffect(() => {
-    if (savedMovies.length > 0) {
-      if (!isAddedCard) {
-        setIsAddedCard(
-          savedMovies.some(
-            (savedMovie) =>
-              savedMovie.movieId === movie.id &&
-              savedMovie.owner === currentUser._id
-          )
-        );
-      } else {
-        setIsAddedCard(false);
-      }
-    }
-  }, []);
-
 
   const functionIcon =
     pathname === "/movies" ? handleLikeMovie : handleDeleteButton;

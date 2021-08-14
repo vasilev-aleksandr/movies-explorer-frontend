@@ -1,9 +1,9 @@
 .login {
-  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  margin-top: 70px;
 }
 
 .login__container {
@@ -22,6 +22,12 @@
   font-size: 24px;
   line-height: 29px;
   font-weight: 400;
+}
+
+@media screen and (max-width: 768px) {
+  .login {
+    margin-top: 232px;
+  }
 }
 
 @media screen and (max-width: 576px) {
