@@ -1,49 +1,108 @@
-import { propsProfile } from "../../utils/constants";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import "./Profile.css";
+import CurrentUserContext from "../../contexts/CurrentUserContext";
+import CallbackValidation from "../../validation/CallbackValidation";
+import Header from "../Header/Header";
 
-function Profile({ onSignOut }) {
+function Profile({ 
+  handleLogout,
+  editProfile,
+  loggedIn,
+  isEditError,
+  isEditDone,
+ }) {
 
-  const [inputsStates, setInputStates] = useState({});
+  const currentUser = React.useContext(CurrentUserContext);
+  const formWithValidation = CallbackValidation();
+  const { email, name } = formWithValidation.values;
+  
+  useEffect(() => {
+    formWithValidation.setValues({
+      email: currentUser.email,
+      name: currentUser.name,
+    });
+  }, []);
 
-  useEffect(() => (
-    propsProfile.inputsList.forEach(item => {
-      setInputStates((prev => ({
-        ...prev,
-        [item.name]: item.value,
-      })));
-    })
-  ), []);
 
-  const handleChangeInput = (e) => {
-    setInputStates((prev => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    })));
+
+
+  const submitEditProfile = (event) => {
+    event.preventDefault();
+    editProfile(name, email);
   };
 
-  const fieldList = propsProfile.inputsList.map(item => {
-
-      const value = inputsStates[item.name] || "";
-      return (
-        <div key={`profile-${item.name}`} className="profile__field">
-          <label htmlFor={item.name} className="profile__label"> {item.label} </label>
-          <input className="profile__input" value={value} onChange={handleChangeInput} {...item}/>
-          <span className="profile__error">Что-то пошло не так....</span>
-        </div>
-      );
-    },
-  );
-
   return (
-    <form className="profile">
-      <h2 className="profile__title">Привет, Александр!</h2>
-      <fieldset className="profile__fieldset">
-        {fieldList}
-      </fieldset>
-      <button className="profile__btn">Редактировать</button>
-      <button className="profile__btn profile__btn_type_exit" onClick={onSignOut}>Выйти из аккаунта</button>
-    </form>
+    <>
+    <Header loggedIn={loggedIn} />
+    <section className="profile">
+        <div className="profile__container">
+          <h1 className="profile__title">
+            Привет, {currentUser && currentUser.name}
+            !
+          </h1>
+          <form
+            noValidate
+            onSubmit={submitEditProfile}
+            className="profile__form"
+            name="edit-form"
+          >
+            <label className="profile__label" htmlFor="name">
+              Имя
+              <input 
+                type="text"
+                onChange={formWithValidation.handleChange}
+                value={name || ""}
+                required
+                minLength="2"
+                maxLength="30"
+                className="profile__input"
+                name="name"
+              />
+            </label>
+            <label className="profile__label" htmlFor="email">
+              Почта
+              <input
+                type="email"
+                onChange={formWithValidation.handleChange}
+                value={email || ""}
+                required
+                className="profile__input"
+                name="email"
+              />
+            </label>
+            <p className="profile__form-error">
+              {formWithValidation.errors.name ||
+                formWithValidation.errors.email}
+            </p>
+            {isEditError && (
+              <p className="profile__form-error">Ошибка обновления данных</p>
+            )}
+            {isEditDone && (
+              <p className="profile__form-done">Данные успешно обновлены</p>
+            )}
+            <button
+              className="profile__btn-edit"
+              type="submit"
+              disabled={
+                (currentUser &&
+                  name === currentUser.name &&
+                  email === currentUser.email) ||
+                !formWithValidation.isValid
+              }
+            >
+              Редактировать
+            </button>
+            <button
+              onClick={handleLogout}
+              className="profile__btn-logout"
+              type="button"
+            >
+              Выйти из аккаунта
+            </button>
+          </form>
+        </div>
+      </section>
+    </>
   );
 }
 

@@ -98,6 +98,7 @@
 
   .navigation__list_opened {
     width: 520px;
+    z-index: 1;
   }
 
   .navigation__list li {

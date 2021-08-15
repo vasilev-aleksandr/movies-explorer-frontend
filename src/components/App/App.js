@@ -1,64 +1,167 @@
 import "./App.css";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Main from "../Main/Main";
 import Header from "../Header/Header";
-import { Route, Switch, useLocation } from "react-router";
+import { Route, Switch, useLocation, useHistory, Redirect } from "react-router";
 import Footer from "../Footer/Footer";
 import Error from "../Error/Error";
 import Login from "../Login/Login";
 import Register from "../Register/Register";
 import Profile from "../Profile/Profile";
 import Movies from "../Movies/Movies";
-import { movies } from "../../utils/constants";
+import MainApi from "../../utils/MainApi";
+import CurrentUserContext from "../../contexts/CurrentUserContext";
+import ProtectedRoute from "../ProtectedRoute/ProtectedRoute";
+import Preloader from '../Preloader/Preloader';
+
+
+
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
-  const {pathname} = useLocation();
+  const [currentUser, setCurrentUser] = useState({});
+  const [isEditDone, setIsEditDone] = useState(false);
+  const [registrationError, setRegistrationError] = useState(false);
+  const [loginError, setLoginError] = useState(false);
+  const [EditError, setEditError] = useState(false);
+  const history = useHistory();
+  const { pathname } = useLocation();
+  const [isPreloaderOpen, setIsPreloaderOpen] = useState(true);
 
-  const handleSignIn = () => {
-    setLoggedIn(false);
+
+  useEffect(() => {
+    isLoggedInCheck();
+  }, []);
+
+  function isLoggedInCheck() {
+    setIsPreloaderOpen(true);
+    const jwt = localStorage.getItem("jwt");
+    if (jwt) {
+      MainApi.getInfo()
+      .then((userInfo) => {
+    if (userInfo) {
+      setCurrentUser(userInfo);
+      setLoggedIn(true);
+    }
+    })
+    .catch((err) => {
+      
+    })
+    .finally(() => setIsPreloaderOpen(false))
+    } else {
+      setIsPreloaderOpen(false)
+      }
+    }
+
+
+  function handleLogin(email, password) {
+    MainApi.login(email, password)
+      .then((data) => {
+        if (data) {
+          setCurrentUser(data.user);
+          setLoggedIn(true);
+          history.push("/movies");
+        }
+      })
+      .catch((err) => {
+        setLoginError(true);
+        console.log(err);
+      });
   }
 
-  const handleSignOut = () => {
-    setLoggedIn(false);
+
+  function handleRegister(email, password, name) {
+    MainApi.register(email, password, name)
+      .then((data) => {
+        if (data) {
+          handleLogin(email, password);
+          setLoggedIn(true);
+          history.push("/signin");
+        }
+      })
+      .catch(() => {
+        setRegistrationError(true);
+      });
   }
 
+  function editProfile(name, email) {
+    MainApi.setInfo(name, email)
+      .then((info) => {
+        console.log(info);
+        setCurrentUser(info);
+        setIsEditDone(true);
+        setEditError(false);
+        setTimeout(() => {
+          setIsEditDone(false);
+        }, 4000);
+      })
+      .catch(() => {
+        setEditError(true);
+      })
+  }
+
+  function handleLogout() { 
+    history.push("/"); 
+    setLoggedIn(false); 
+    setCurrentUser({});
+    localStorage.clear(); 
+  }
+
+  if (isPreloaderOpen) return <Preloader isPreloaderOpen={isPreloaderOpen}/>
   return (
     <div className="page">
-      <Switch>
-        <Route path="/error">
-          <Error/>
-        </Route>
-        <Route path="/signin">
-          <Login onSignIn={handleSignIn}/>
-        </Route>
-        <Route path="/signup">
-          <Register/>
-        </Route>
-        <Route path="/">
+      <CurrentUserContext.Provider value={currentUser}>
+        <Switch>
+        <Route path="/" exact>
           <div className={`page__container ${pathname === '/' && "page__container_blue"}`}>
             <Header loggedIn={loggedIn}/>
-          </div>
-          <Route exact path="/">
-            <Main/>
-          </Route>
-          <Route path="/movies">
-            <Movies movies={movies}/>
-          </Route>
-          <Route path="/saved-movies">
-            <Movies movies={movies.filter(item => item.saved)}/>
-          </Route>
-          <Route path="/profile">
-            <Profile onSignOut={handleSignOut}/>
-          </Route>
-          <Switch>
-            <Route path="/profile"/>
-            <Route path="/">
-              <Footer/>
-            </Route>
-          </Switch>
+          </div>          
+          <Main />
+          <Footer />
         </Route>
-      </Switch>
+          <ProtectedRoute
+            path="/movies"
+            exact
+            component={Movies}
+            loggedIn={loggedIn}
+            currentUser={currentUser}
+          />
+          <ProtectedRoute
+            path="/saved-movies"
+            exact
+            component={Movies}
+            loggedIn={loggedIn}
+            currentUser={currentUser}
+            />
+          <ProtectedRoute
+            path="/profile"
+            exact
+            component={Profile}
+            handleLogout={handleLogout}
+            editProfile={editProfile}
+            loggedIn={loggedIn}
+            currentUser={currentUser}
+            EditError={EditError}
+            isEditDone={isEditDone}
+            />
+          <Route path="/signin" exact>
+            {loggedIn && <Redirect to="/"/>}
+            <Login 
+              handleLogin={handleLogin} 
+              loginError={loginError} />
+          </Route>
+          <Route path="/signup" exact>
+          {loggedIn && <Redirect to="/"/>}
+            <Register
+              handleRegister={handleRegister}
+              registrationError={registrationError}
+            />
+          </Route>
+            <Route path="*">
+              <Error/>
+          </Route>
+        </Switch>
+      </CurrentUserContext.Provider>
     </div>
   );
 }
